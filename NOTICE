@@ -1,12 +1,27 @@
-This repository redistributes converted copies of the following MIT-licensed projects.
-Original copyright and permission notices are reproduced in full below, per MIT's terms.
+This repository redistributes converted copies of third-party model code and weights.
+Original copyright and permission notices are reproduced in full below, per each project's
+license terms.
 
 ================================================================================
 demucs_v4_two_stems.onnx, demucs_v4_two_stems.onnx.data
 Source: https://github.com/facebookresearch/demucs
 ================================================================================
 
-MIT License
+IMPORTANT — two different licenses apply to this export:
+
+  - The Demucs *code* (including this ONNX export/graph) is MIT-licensed — see the MIT
+    License text below, reproduced from the facebookresearch/demucs repository.
+  - The *pretrained weights* baked into this export (Meta's `htdemucs` checkpoint) were
+    trained on the MUSDB18-HQ dataset, which is licensed CC-BY-NC-SA 4.0
+    (https://creativecommons.org/licenses/by-nc-sa/4.0/) — a **non-commercial** license.
+    That restriction attaches to the trained weights themselves, not just to Meta's training
+    code, so this restriction is inherited by anyone who redistributes or uses these weights.
+
+  Consumers of this file (including OraKara, the app this repo mirrors models for) must be
+  distributed free / non-commercially, or must obtain separate rights to the weights, before
+  using this file. It is NOT accurate to describe these weights as simply "MIT."
+
+MIT License (applies to the Demucs code / this export, not the pretrained weights above)
 
 Copyright (c) Meta Platforms, Inc. and affiliates.
 
