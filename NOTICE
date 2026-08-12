@@ -69,3 +69,52 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+================================================================================
+MelBandRoformer.onnx
+Source: https://github.com/KimberleyJensen/Mel-Band-Roformer-Vocal-Model
+Reference architecture: https://github.com/lucidrains/BS-RoFormer (Apache-2.0)
+Training code: https://github.com/ZFTurbo/Music-Source-Separation-Training (MIT)
+================================================================================
+
+Weights license: MIT, self-declared by the checkpoint's trainer (Kimberley Jensen) via her
+own Hugging Face repo's license tag/metadata field
+(huggingface.co/KimberleyJSN/melbandroformer, cardData: {"license": "mit"}), confirmed
+2026-08-12. This is a real primary-source declaration by the checkpoint's own author/host,
+but it is a metadata tag only — there is no separate long-form LICENSE text spelling out
+attribution/commercial-use terms (her GitHub repo has no LICENSE file; the Hugging Face
+repo's README is empty).
+
+The reference architecture (lucidrains/BS-RoFormer) is Apache License 2.0. The training
+code (ZFTurbo/Music-Source-Separation-Training) is MIT. Full text of both is standard and
+available at their respective repositories; not reproduced here since this file only ships
+the trained weights, converted (not retrained) to ONNX by this repo's own export script.
+
+================================================================================
+BSRoformerViperx.onnx
+Source: https://github.com/TRvlvr/model_repo (release "all_public_uvr_models",
+  file model_bs_roformer_ep_317_sdr_12.9755.ckpt)
+Trainer: "viperx" (GitHub handle playdasegunda)
+Reference architecture: https://github.com/lucidrains/BS-RoFormer (MIT)
+Training code: https://github.com/ZFTurbo/Music-Source-Separation-Training (MIT)
+================================================================================
+
+IMPORTANT — the weights license for this specific checkpoint is UNVERIFIED:
+
+  No primary-source statement of terms was found for this checkpoint as of 2026-08-13,
+  checked directly against every location it's known to be hosted: TRvlvr/model_repo
+  (release-level `license: null`, no repo LICENSE file) and third-party Hugging Face
+  mirrors (Eddycrack864/Music-Source-Separation-Training, KitsuneX07/..., Derur/UVR-models,
+  SayanoAI/RVC-Studio) — none of which are the trainer's own canonical host, and none of
+  which declare a license either. Unlike MelBandRoformer.onnx above, there is no equivalent
+  self-declared license tag from the trainer to point to.
+
+  Treat these weights as restricted/non-commercial-only until a primary-source statement of
+  terms from "viperx"/playdasegunda is located. This file is mirrored here as a
+  research/catalog entry consistent with OraKara's own `license_tier: NonCommercial`
+  classification for this model — that classification is the conservative default, not a
+  confirmed clearance.
+
+The reference architecture (lucidrains/BS-RoFormer) and training code (ZFTurbo/
+Music-Source-Separation-Training) are both MIT-licensed — that covers the *code* used to
+produce this export, not the trained weights themselves (see above).

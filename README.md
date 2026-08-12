@@ -10,6 +10,8 @@ a third-party model, verbatim license terms preserved below.
 |---|---|---|---|
 | `demucs_v4_two_stems.onnx` + `.onnx.data` | [facebookresearch/demucs](https://github.com/facebookresearch/demucs) (pretrained `htdemucs` weights), exported to ONNX offline | MIT (Meta Platforms, Inc.) | **CC-BY-NC-SA 4.0 — non-commercial** (trained on MUSDB18-HQ) |
 | `aesthetic_head.onnx` | [LAION-AI/aesthetic-predictor](https://github.com/LAION-AI/aesthetic-predictor)'s `sa_0_4_vit_b_32_linear.pth`, converted to ONNX offline | MIT (LAION AI) | MIT (LAION AI) |
+| `MelBandRoformer.onnx` | [KimberleyJensen/Mel-Band-Roformer-Vocal-Model](https://github.com/KimberleyJensen/Mel-Band-Roformer-Vocal-Model)'s `MelBandRoformer.ckpt`, exported to ONNX offline | Apache-2.0 (ByteDance Mel-Band RoFormer reference architecture) | MIT, self-declared via the checkpoint author's own Hugging Face repo license tag (`huggingface.co/KimberleyJSN/melbandroformer`) — no separate long-form LICENSE text located |
+| `BSRoformerViperx.onnx` | `TRvlvr/model_repo`'s `model_bs_roformer_ep_317_sdr_12.9755.ckpt` (community checkpoint by "viperx"/`playdasegunda`), exported to ONNX offline | MIT (`lucidrains/BS-RoFormer` reference implementation) | **Unverified** — no license stated anywhere for this specific community-trained checkpoint as of 2026-08-13; treat as restricted/non-commercial until a primary-source statement of terms is found |
 
 **The Demucs weights are not MIT.** The Demucs *code* (and this ONNX export/graph) is MIT,
 but the pretrained `htdemucs` *weights* were trained by Meta on the MUSDB18-HQ dataset, which
@@ -21,6 +23,14 @@ distributed free/non-commercially, or must separately clear the weights, before 
 
 The LAION aesthetic head's weights carry no license separate from its MIT code repo
 (verified directly against the repo's `LICENSE` file, not assumed).
+
+**`BSRoformerViperx.onnx`'s weights license is unverified — treat as non-commercial/
+restricted.** Unlike the other files here, no primary-source license statement (a repo
+LICENSE file, a Hugging Face license tag, anything) was found for this specific checkpoint
+anywhere it's hosted (`TRvlvr/model_repo` and every third-party mirror checked). It's
+mirrored here purely as a research/catalog entry alongside the others — OraKara's own
+`license_tier: NonCommercial` classification for this model reflects the same caveat, not a
+confirmed clearance for commercial use.
 
 ## Why this repo exists
 
@@ -55,6 +65,38 @@ python scripts/export_aesthetic_head.py sa_0_4_vit_b_32_linear.pth aesthetic_hea
 Reads LAION's single-`nn.Linear(512, 1)` checkpoint directly (no PyTorch needed) and
 re-emits it as a 1-node ONNX `Gemm` graph.
 
+**`MelBandRoformer.onnx`** — via [`scripts/export_mel_band_roformer.py`](scripts/export_mel_band_roformer.py):
+```
+pip install torch einops pyyaml onnx onnxscript
+git clone https://github.com/ZFTurbo/Music-Source-Separation-Training  # provides models/bs_roformer/mel_band_roformer.py
+curl -L -o config_vocals_mel_band_roformer.yaml \
+    https://raw.githubusercontent.com/KimberleyJensen/Mel-Band-Roformer-Vocal-Model/main/configs/config_vocals_mel_band_roformer.yaml
+curl -L -o MelBandRoformer.ckpt \
+    https://huggingface.co/KimberleyJSN/melbandroformer/resolve/main/MelBandRoformer.ckpt
+python scripts/export_mel_band_roformer.py
+```
+Loads Kimberley Jensen's published checkpoint into `ZFTurbo/Music-Source-Separation-
+Training`'s `MelBandRoformer` module, monkeypatches the forward pass to stop at the masked
+complex spectrogram (ISTFT has no ONNX-exportable path for a genuine complex-dtype tensor —
+finished in Rust instead, an exact port of `torch.istft`), and exports via
+`torch.onnx.export` (opset 18). Validated against the original unpatched forward pass by
+ISTFT-ing the exported path's output in PyTorch and diffing against the reference model's
+full audio output on identical random input — bit-exact (mean/max abs diff 0.0).
+
+**`BSRoformerViperx.onnx`** — via [`scripts/export_bs_roformer.py`](scripts/export_bs_roformer.py):
+```
+pip install torch einops pyyaml onnx onnxscript
+git clone https://github.com/ZFTurbo/Music-Source-Separation-Training  # provides models/bs_roformer/bs_roformer.py
+curl -L -o config_bs_roformer.yaml \
+    https://raw.githubusercontent.com/ZFTurbo/Music-Source-Separation-Training/main/configs/viperx/model_bs_roformer_ep_317_sdr_12.9755.yaml
+curl -L -o model_bs_roformer_ep_317_sdr_12.9755.ckpt \
+    https://github.com/TRvlvr/model_repo/releases/download/all_public_uvr_models/model_bs_roformer_ep_317_sdr_12.9755.ckpt
+python scripts/export_bs_roformer.py
+```
+Same export/validation approach as `MelBandRoformer.onnx` above, against the "viperx"
+community checkpoint instead — also bit-exact (mean/max abs diff 0.0) vs. the original
+eager forward pass.
+
 ## Verifying a downloaded file matches this repo
 
 The OraKara app itself verifies every download's SHA-256 automatically (see
@@ -66,4 +108,8 @@ sha256sum demucs_v4_two_stems.onnx.data
 # fe0084e8279edd25c032e1c36e1c646a097b3b7835a0734ef467fa7577543cae
 sha256sum aesthetic_head.onnx
 # ed06657a2912fd5f6ac126e047c6b82a3dc1e0b8425b4dba71b1bd93ebb2703c
+sha256sum MelBandRoformer.onnx
+# 3caf6b9c2a76002de7f00c405a837a36431c0c98f9496cdca0cd081e08c6e95e
+sha256sum BSRoformerViperx.onnx
+# 590cb5715968f3052efd205491d513abcec3071fef4534e276649a582c886ce3
 ```
