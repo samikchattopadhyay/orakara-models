@@ -118,3 +118,45 @@ IMPORTANT — the weights license for this specific checkpoint is UNVERIFIED:
 The reference architecture (lucidrains/BS-RoFormer) and training code (ZFTurbo/
 Music-Source-Separation-Training) are both MIT-licensed — that covers the *code* used to
 produce this export, not the trained weights themselves (see above).
+
+================================================================================
+skey.onnx
+Source: https://github.com/deezer/skey (S-KEY / ChromaNet, Kong et al., ICASSP 2025)
+================================================================================
+
+Weights license: MIT (Deezer SA), read from the repo-root LICENSE file below, which covers
+"this software" — and `skey.pt` ships inside the package tree (`skey/models/skey.pt`) as the
+CLI's own default checkpoint, not fetched from a separate source. The README's feature list
+independently states "🧠 A open-sourced pretrained model." This is confirmed 2026-08-15 by
+reading the actual LICENSE file and README content directly (not assumed).
+
+One phrasing caveat, noted for completeness: the README's own "License" section says "the
+**code** of SKEY is MIT-licensed" — read in isolation, that wording could be parsed as
+scoping MIT to the code and leaving the weights unstated. No separate model-card or
+weights-specific license statement exists to resolve that reading definitively either way.
+Taken together with the LICENSE file's own "this software" scope and the shipped-in-package,
+advertised-as-open-source nature of the checkpoint, the weight is toward MIT covering the
+checkpoint too — but this is a considered reading, not a verbatim statement to that exact
+effect the way `aesthetic_head.onnx`'s license is.
+
+MIT License
+
+Copyright (c) 2019-present, Deezer SA.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

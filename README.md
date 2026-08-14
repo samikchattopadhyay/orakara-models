@@ -14,6 +14,7 @@ a third-party model, verbatim license terms preserved below.
 | `BSRoformerViperx.onnx` | `TRvlvr/model_repo`'s `model_bs_roformer_ep_317_sdr_12.9755.ckpt` (community checkpoint by "viperx"/`playdasegunda`), exported to ONNX offline | MIT (`lucidrains/BS-RoFormer` reference implementation) | **Unverified** — no license stated anywhere for this specific community-trained checkpoint as of 2026-08-13; treat as restricted/non-commercial until a primary-source statement of terms is found |
 | `UVR-DeEcho-DeReverb.onnx` | [Anjok07/ultimatevocalremovergui](https://github.com/Anjok07/ultimatevocalremovergui) (Ultimate Vocal Remover, "UVR")'s `UVR-DeEcho-DeReverb.pth` (VR-arch "5.1" `CascadedNet`), exported to ONNX offline | MIT (UVR GUI code) | MIT, with a request to credit UVR (Anjok07 & aufr33) as trainers — see caveat below |
 | `UVR-DeNoise.onnx` | [Anjok07/ultimatevocalremovergui](https://github.com/Anjok07/ultimatevocalremovergui)'s `UVR-DeNoise.pth` (same VR-arch "5.1" family as DeEcho/DeReverb) | MIT (UVR GUI code) | MIT, with a request to credit UVR (Anjok07 & aufr33) as trainers — see caveat below |
+| `skey.onnx` | [deezer/skey](https://github.com/deezer/skey)'s `skey.pt` (S-KEY / ChromaNet, ICASSP 2025), exported to ONNX offline | MIT (Deezer SA) | MIT (Deezer SA) — see caveat below |
 
 **The Demucs weights are not MIT.** The Demucs *code* (and this ONNX export/graph) is MIT,
 but the pretrained `htdemucs` *weights* were trained by Meta on the MUSDB18-HQ dataset, which
@@ -33,6 +34,19 @@ anywhere it's hosted (`TRvlvr/model_repo` and every third-party mirror checked).
 mirrored here purely as a research/catalog entry alongside the others — OraKara's own
 `license_tier: NonCommercial` classification for this model reflects the same caveat, not a
 confirmed clearance for commercial use.
+
+**`skey.onnx`'s weights license rests on a slightly indirect reading, flagged here rather
+than asserted outright.** deezer/skey's repo-root `LICENSE` file is a standard MIT grant
+("Copyright (c) 2019-present, Deezer SA") covering "this software" — and `skey.pt` ships
+*inside* the package (`skey/models/skey.pt`) as the CLI's own default checkpoint, not
+fetched from a separate, opaquely-licensed source. The README's feature list also states
+outright: "🧠 A open-sourced pretrained model." Taken together this is a materially stronger
+signal than `MelBandRoformer.onnx`'s case above (a Hugging Face metadata tag with no
+long-form LICENSE at all) — but unlike `aesthetic_head.onnx`, deezer/skey's own README
+License section phrases it as "the **code** of SKEY is MIT-licensed," which read in
+isolation could be parsed as scoping MIT to the code only. No separate model-card or
+weights-specific license statement was found to resolve that phrasing definitively either
+way. See `NOTICE` for the full LICENSE text and this same reasoning reproduced in full.
 
 ## Why this repo exists
 
@@ -99,6 +113,25 @@ Same export/validation approach as `MelBandRoformer.onnx` above, against the "vi
 community checkpoint instead — also bit-exact (mean/max abs diff 0.0) vs. the original
 eager forward pass.
 
+**`skey.onnx`** — via [`scripts/export_skey_onnx.py`](scripts/export_skey_onnx.py):
+```
+git clone https://github.com/deezer/skey.git
+cd skey
+pip install torch torchaudio numpy einops soundfile nnAudio onnx onnxscript
+python export_skey_onnx.py
+```
+Loads the harmonic-VQT front end (`hcqt.py`'s `VQT`) and `ChromaNet` classifier directly from
+`skey.pt`, fuses them into one `forward()` (the reference `CropCQT` module's per-sample crop
+loop is only needed for training-time pitch-shift augmentation — real inference always crops
+from index 0, so this export bakes that in as a static slice), and exports via
+`torch.onnx.export` at a **fixed** input length (15s @ 22,050 Hz = 330,750 samples — S-KEY's
+VQT front end does not trace correctly under a dynamic sample-count axis; a dynamic-shape
+export attempt silently produced a malformed, wrong-shaped output, while this fixed-shape
+export is numerically exact against the original PyTorch model, ~4e-6 max abs diff, float32
+noise). The consuming Rust code windows a full track into several fixed-length clips and
+aggregates by majority vote rather than needing one dynamic-length call — see
+`crates/music-key-model` in the main OraKara repo.
+
 ## Verifying a downloaded file matches this repo
 
 The OraKara app itself verifies every download's SHA-256 automatically (see
@@ -114,4 +147,6 @@ sha256sum MelBandRoformer.onnx
 # 3caf6b9c2a76002de7f00c405a837a36431c0c98f9496cdca0cd081e08c6e95e
 sha256sum BSRoformerViperx.onnx
 # 590cb5715968f3052efd205491d513abcec3071fef4534e276649a582c886ce3
+sha256sum skey.onnx
+# 521f82a11c5b52cdf92cb9f1421b1e92234c5437c811bedd689adbe648e891b3
 ```
